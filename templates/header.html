@@ -1,0 +1,21 @@
+<div>
+    <nav class="navbar navbar-light bg-light">
+    <a class="navbar-brand">Catalog App</a>
+        <!-- If user has logged in, show the "Lot Out" button. Otherwise, show "Log In" button. -->
+        {% if "username" in session %}
+            <a href="{{url_for('gdisconnect')}}">
+                <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Log Out</button>
+            </a>
+        {% else %}
+            <a href="{{url_for('showLogin')}}">
+                <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Log In</button>
+            </a>
+        {% endif %}
+    </nav>
+    {% if "username" in session %}
+        <!-- Show a reminder with username if user has logged in. -->
+        <div class="alert alert-light" role="alert">
+            You are logged in as {{session["username"]}}
+        </div>
+    {% endif %}
+</div>

@@ -1,0 +1,40 @@
+{% extends "main.html" %}
+{% block content %}
+{% include "header.html" %}
+
+<div class="container-fluid">
+    <div class="row row-offcanvas row-offcanvas-right">
+        <div class="col-xs-6 col-sm-3 col-sm-pull-9 sidebar-offcanvas" id="sidebar">
+            <div class="list-group">
+                <!-- List all the categories -->
+                <div class="pt-4"><div class="list-group-item active">Categories</div></div>
+                {% for category in categories %}
+                    <a href="{{url_for('show_items', category_name=category.name)}}" class="list-group-item">
+                        {{category.name}}
+                    </a>
+                {% endfor %}
+            </div>
+        </div><!--/.sidebar-offcanvas-->
+
+        <div class="col-xs-6 col-sm-3 col-sm-pull-9 sidebar-offcanvas">
+            <div class="list-group">
+                <!-- List all items -->
+                <div class="pt-4"><div class="list-group-item active">Latest Items</div></div>
+                {% for item in latest_items %}
+                <a href="{{url_for('show_item_description', category_name=item.category_name, item_name=item.name)}}" class="list-group-item">
+                        {{item.name}} ({{item.category_name}})
+                </a>
+                {% endfor %}
+                <!-- Check if the user has logged in. If so, show the "Add New Item" button. -->
+                {% if "username" in session %}
+                    <div class="pt-4"><a href="{{url_for('add_item')}}" class="list-group-item active">
+                            Add New Item
+                    </a></div>
+                {% endif %}
+            </div>
+        </div><!--/.sidebar-offcanvas-->
+
+    </div>
+</div>
+
+{% endblock %}

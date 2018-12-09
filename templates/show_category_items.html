@@ -1,0 +1,45 @@
+{% extends "main.html" %}
+{% block content %}
+{% include "header.html" %}
+
+    <div class="container-fluid">
+        <div class="row row-offcanvas row-offcanvas-right">
+
+            <div class="col-xs-6 col-sm-3 col-sm-pull-9 sidebar-offcanvas" id="sidebar">
+                <!-- List all the categories -->
+                <div class="list-group">
+                    <div class="pt-4"><div class="list-group-item active">Categories</div></div>    
+                    {% for category in categories %}
+                        <a href="{{url_for('show_items', category_name=category.name)}}" class="list-group-item">
+                            {{category.name}}
+                        </a>
+                    {% endfor %}
+                </div>
+            </div><!--/.sidebar-offcanvas-->
+    
+            <div class="col-xs-6 col-sm-3 col-sm-pull-9 sidebar-offcanvas">
+                <div class="list-group">
+                    <!-- If the number of items in this category is less than 2, use the singular header. 
+                    Otherwise, use the plural header.-->
+                    {% if count < 2 %}
+                        <div class="pt-4"><div class="list-group-item active">
+                            {{category_name}} Items ({{count}} Item)
+                        </div></div>
+                    {% else %}
+                        <div class="pt-4"><div class="list-group-item active">
+                            {{category_name}} Items ({{count}} Items)
+                        </div></div>
+                    {% endif %}
+                    
+                    <!-- List all the items -->
+                    {% for item in category_items %}
+                    <a href="{{url_for('show_item_description', category_name=item.category_name, item_name=item.name)}}" class="list-group-item">
+                        {{item.name}}
+                    </a>
+                    {% endfor %}
+                </div>
+            </div><!--/.sidebar-offcanvas-->
+    
+        </div>
+    </div>
+{% endblock %}

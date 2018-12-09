@@ -1,0 +1,19 @@
+{% extends "main.html" %}
+{% block content %}
+{% include "header.html" %}
+
+    <div><h3>Delete Item</h3></div>
+
+    <form action="{{ url_for('delete_item', item_name=item_name)}}" method = "POST">
+        <p class="lead">
+            Are you sure you want to delete {{ item_name}}?
+        </p>
+
+        <button type="submit" class="btn btn-danger">Delete</button>
+    </form>
+    <!-- A button to abort the deletion and go back to the main page. -->
+    <div class="pt-4"><a href = "{{url_for('show_all_categories')}}">
+        <button class="btn btn-secondary">Cancel</button>
+    </a></div>
+
+{% endblock %}
