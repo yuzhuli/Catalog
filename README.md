@@ -71,8 +71,12 @@ source env/bin/activate
 13. In the virtual environment, install the following python packages:flask, sqlalchemy, requests
 
 #### Deploy the Item Catalog project
-14. Create the /var/www/html/myapp.wsgi file using the command sudo nano /var/www/html/myapp.wsgi
-15. Add the following lines in the /var/www/html/myapp.wsgi file:
+14. In the Home directory of the ubuntu user, git clone the repository for the project Catalog.
+15. Create the /var/www/html/myapp.wsgi file
+```
+sudo nano /var/www/html/myapp.wsgi
+```
+16. Add the following lines in the /var/www/html/myapp.wsgi file:
 ```
 activate_this = '/home/ubuntu/Catalog/.env/bin/activate_this.py'
 execfile(activate_this, dict(__file__=activate_this))
@@ -81,14 +85,14 @@ sys.path.insert(0, '/home/ubuntu/Catalog')
 
 from catalog_project import app as application
 ```
-16. You need to use the asbolute URI for the database in the Catalog project. If not, update the create_engine function in catalog_project.py and database_setup.py to the following:
+17. You need to use the asbolute URI for the database in the Catalog project. If not, update the create_engine function in catalog_project.py and database_setup.py to the following:
 ```
 engine = create_engine(
    'sqlite:////absolute/path/to/file/catalog.db',
     connect_args={'check_same_thread': False},
 )
 ```
-17. Now the web application should be served correctly on the server.
+18. Now the web application should be served correctly on the server.
 
 ### Reference Recoures 
 1. Deploy Flask application to a WSGI server
