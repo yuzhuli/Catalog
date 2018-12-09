@@ -1,4 +1,4 @@
-# Project: Linux Server Configuration
+## Project: Linux Server Configuration
 The goal of this project is to install a Linux server on Amazon Lightsail and prepare it to host my web application Catalog.
 
 # IP Address and SSH Port
