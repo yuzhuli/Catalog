@@ -17,6 +17,6 @@ http://54.245.134.41.xip.io/
 6. The following python packages are also installed: flask, sqlalchemy, requests
 
 ### Location of SSH Public Key
-/home/grader/.ssh/id_rsa
-The passphrase to access this file is: grader
+1. SSH Public Key for the user "grader" is located at: /home/grader/.ssh/id_rsa
+2. The passphrase to access this file is: grader
 
