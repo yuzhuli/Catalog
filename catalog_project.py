@@ -56,7 +56,11 @@ def showLogin():
     login_session['state'] = state
     return render_template('login.html', STATE=state)
 
-
+# The following function is the server side code to implement the Google+ hybrid authentication flow.
+# It works with a frontend web page to allow users to log in with their google accounts.
+# The front end code can be found at https://github.com/yuzhuli/Catalog/blob/master/templates/login.html
+# The highlight of the function is how it uses several layers of verification to protect agains 
+# cross-site request forgery, replay request and man-in-the-middle attacks.
 # Handle the POST request from client with the token from Google
 @app.route('/gconnect', methods=['POST'])
 def gconnect():
