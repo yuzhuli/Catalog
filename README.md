@@ -1,48 +1,106 @@
-# Project: Catalog
-This project developing an application that provides a list of gears within a variety of sports, as well as provide a user registration and authentication system.
+## Project: Linux Server Configuration
+The goal of this project is to install a Linux server on Amazon Lightsail and prepare it to host my web application Catalog.
 
-# About the Database
-There are 3 tables in the news database: Category, Item, User.
+### IP Address and SSH Port
+The public IP address of the server is 54.245.134.41 and the SSH port is 2200.
 
-1. "Category" table: Consists of the list of sport categories. Each row has two columns: id (primary key) and name which is the name of the sport. 
+### URL to the web application Catalog
+The complete url is:
+http://54.245.134.41.xip.io/
 
-2. "Item" table: Includes information about all the sport gears. Each row has 6 columns: id (primary key), name, time_added, description, user_id, and category_name. "user_id" is a foreign key that relates to the id column in User table and category_name is also a foreign key that relates to the name column of Category table. "time_added" will be populated by the acutal time when the item is created/added, and it will be updated when the item is editted. 
+### List of Installed Software
+1. Apache HTTP Server
+2. mod_wsgi
+3. finger
+4. git
+5. virtual environment
+6. The following python packages are also installed: flask, sqlalchemy, requests
 
-3. "User" table: Consists of the information about the users registered in the application. Each row has 3 columns: id (primay key), name and email. Since this application only implements authentication via Google,the "email" will be user's gmail account and "name" will be the name associated with that account.
+### Location of SSH Public Key
+1. SSH Public Key for the user "grader" is located at: /home/grader/.ssh/id_rsa
+2. The passphrase to access this file is: grader
 
-# Configuration
-1. This project requires the use of virtual machine. You can download it here https://www.virtualbox.org/wiki/Download_Old_Builds_5_1
-2. Download and install Vagrant from https://www.vagrantup.com/downloads.html
-3. Download the Vagrant configuration from this repository https://github.com/udacity/fullstack-nanodegree-vm . Unzip the downloaded file and cd into the vagrant directory inside it. 
-4. Then use "vagrant up" in the terminal to bring the vm up. And use "vagrant ssh" to log into the vm. 
+### Steps to Configure the Server
+#### Get and Prepare the Server
+1. Start a new Ubuntu Linux server instance on Amazon Lightsail. 
+2. Connect to the server using the button "Connect using SSH" on the Lightsail instance home page.
+3. After ssh to the server, update currently installed packages
+```
+sudo apt-get update
+sudo apt-get upgrade
+```
+  You may encounter a dialog asking "A new version of configuration file /etc/default/grub is available. But the version installed currently has been locally modified". If this happens, you can choose "Keep the local version installed" for now.But this will cause some packages being kept back and not upgraded. If you want to update these packages in the future, you can use the following command
+```
+sudo apt-get install <list of packages kept back>
+```
+4. Set up the firewall to allow incoming connections for SSH (port 2200), HTTP (port 80), and NTP (port 123). 
+```
+sudo ufw allow 2200
+```
+5. Add port 2200 to Amazon Firewall configuration by going to the Network tab in your Lightsail instance.
+6. Download the private key from your Lightsail Account page and change its permission setting. (On your instance home page, go to "Connect" tab and scroll down to the bottom. You'll find the link to download the key).
+7. Change the ssh port to 2200 by editing the file /etc/ssh/sshd_config. Locate the line # Port 22, uncomment it and change it to 2200.
+8. Now you should be able to ssh to the server in your terminal using the command
+``` 
+ssh -i <location of your key> ubuntu@ip-address -p 2200
+```
+9. After ssh to the server, deny the connection for SSH port 22.
+  
+#### Prepare to Deploy the Project
+10. Install Apache
+```
+sudo apt-get install apache2
+```
+11. Install mod_wsgi
+``` 
+sudo apt-get install libapache2-mod-wsgi
+```
+12. Create Python virtual environment using the following steps:
+```
+# To install Python’s virtual environment:
+sudo apt install virtualenv
+# Create New Directory in Home
+cd
+mkdir python-environments
+cd python-environments
+# Create a Virtual Environment in Python
+virtualenv -p python env
+# Activate Environment
+source env/bin/activate
+```
+13. In the virtual environment, install the following python packages:flask, sqlalchemy, requests
 
-# Download Project Files
-1. Please download the zip file Catalog_YL.zip and unzip it.
-2. Put the folder into the vagrant directory.
-3. Please run the file lots_of_data.py first. This will create some data so that the rendered page won't be blank. 
-4. The file catalogProject.py consists of the source code to run the server. The file database_setup.py contains the code to set up the database models. The information needed to use Google OAuth is saved in client_secrets.json. 
+#### Deploy the Item Catalog project
+14. In the Home directory of the ubuntu user, git clone the repository for the project Catalog.
+15. Create the /var/www/html/myapp.wsgi file
+```
+sudo nano /var/www/html/myapp.wsgi
+```
+16. Add the following lines in the /var/www/html/myapp.wsgi file:
+```
+activate_this = '/home/ubuntu/Catalog/.env/bin/activate_this.py'
+execfile(activate_this, dict(__file__=activate_this))
+import sys
+sys.path.insert(0, '/home/ubuntu/Catalog')
 
-# Run the Code
-1. Please make sure to complete the steps in the section "Configuration and Data" and "Download Project Files"
-2. cd to the vagrant directory and then cd to the directory Catalog_YL.
-3. Please run lots_of_data.py first by typing the following command into terminal: ./lots_of_data.py
-4. Then run the server by typing the following command into terminal: ./catalog_project.py
-5. Now you'll be albe to access the pages listed in Availalbe URLs.
+from catalog_project import app as application
+```
+17. You need to use the asbolute URI for the database in the Catalog project. If not, update the create_engine function in catalog_project.py and database_setup.py to the following:
+```
+engine = create_engine(
+   'sqlite:////absolute/path/to/file/catalog.db',
+    connect_args={'check_same_thread': False},
+)
+```
+18. Now the web application should be served correctly on the server.
 
-# Available URLs
-The application is hosted on localhost://8000 and it implements the following URLs:
-1. localhost://8000
-    Returns all the sport categories and the latest 9 items added to the database. 
-    Without signing in, this page will render the html template "all_categories_not_loggedin.html". And on the page, there won't be a button to add new items.
-    With signing in, the page will render the html template "all_categories_loggedin.html" instead and shows an "Add Item" button. 
-2. localhost://8000/catalog/<string:category_name>/items
-    Returns the gears/equipments within a certain sport category.
-3. localhost://8000/catalog/add
-    Returns the page to add a new item. This page can only be accessed when the user is signed in and is the owner of that item.
-4. localhost://8000/catalog/<string:category_name>/<string:item_name>
-    Returns a page with description of an item.
-    When logged in, this page will also show the button to edit or delete an item.
-5. localhost://8000//catalog/<string:item_name>/edit
-    Returns the page to edit an item. This page can only be accessed when the user is signed in and is the owner of that item.
-6. localhost://8000//catalog/<string:item_name>/delete
-    Returns the page to delete an item. This page can only be accessed when the user is signed in and is the owner of that item.
+### Reference Recoures 
+1. Deploy Flask application to a WSGI server
+http://flask.pocoo.org/docs/1.0/deploying/
+http://flask.pocoo.org/docs/1.0/deploying/mod_wsgi/
+2. Create Python Virtual Environment on Ubuntu
+https://www.linode.com/docs/development/python/create-a-python-virtualenv-on-ubuntu-1610/
+3. Solution to the error "(OperationalError) unable to open database file None None"
+https://stackoverflow.com/questions/18208492/sqlalchemy-exc-operationalerror-operationalerror-unable-to-open-database-file
+4. Solution to the update problem "The following packages have been kept back"
+https://askubuntu.com/questions/601/the-following-packages-have-been-kept-back-why-and-how-do-i-solve-it
